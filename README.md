@@ -3,6 +3,7 @@
 ### Subject: Emotional and Technical Analysis of 2000s Rock via Spotify Data
 
 This project was developed as a term project for the **Data Visualization (2026)** course.
+
 **Author:** Illia Khurtak, **UCU Data Science** Program.
 **Instructor:** [Yevheniya Drozdova]([url](https://www.facebook.com/drozdova.e.a/)).
 
