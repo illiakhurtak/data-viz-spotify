@@ -6,7 +6,7 @@ This project was developed as a term project for the **Data Visualization (2026)
 
 **Author:** Illia Khurtak, **UCU Data Science** Program.
 
-**Instructor:** [Yevheniya Drozdova](https://www.facebook.com/drozdova.e.a/)).
+**Instructor:** [Yevheniya Drozdova](https://www.facebook.com/drozdova.e.a/).
 
 ---
 
