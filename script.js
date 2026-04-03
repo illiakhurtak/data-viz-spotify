@@ -2,7 +2,7 @@
 const tooltip = d3.select("#tooltip");
 
 // Load data from CSV
-d3.csv("tracks.csv").then(function(data) {
+d3.csv("tracks_light.csv").then(function(data) {
     // Define target artists and their neon colors
     const targetArtists = ["My Chemical Romance", "Blink-182", "Sum 41", "Coldplay"];
     const colorScale = d3.scaleOrdinal()
