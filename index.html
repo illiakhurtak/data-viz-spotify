@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Рок 2000-х: Аудіо Аналітика</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+
+        body {
+            background-color: #050508;
+            color: #d1d5db;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #8b949e;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+
+        /* artist cards */
+        .roster {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 60px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .artist-card {
+            width: 180px;
+            background: #111218;
+            border-radius: 12px;
+            overflow: hidden;
+            border-bottom: 4px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+        }
+
+        .artist-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px var(--accent-glow);
+        }
+
+        .artist-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            filter: grayscale(40%) contrast(1.2);
+            transition: filter 0.3s;
+        }
+
+        .artist-card:hover img {
+            filter: grayscale(0%) contrast(1.1);
+        }
+
+        .artist-info {
+            padding: 15px;
+            text-align: center;
+            background: linear-gradient(to top, #111218 80%, transparent);
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .artist-info h3 {
+            margin: 0;
+            font-size: 15px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        /* titles on every graph */
+        h2 {
+            color: #fff;
+            font-weight: 700;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            text-align: left;
+            width: 90%;
+            max-width: 1100px;
+            border-left: 4px solid #fff;
+            padding-left: 15px;
+        }
+
+        /* graph container */
+        .chart-container {
+            width: 90%;
+            max-width: 1100px;
+            height: 550px;
+            background: rgba(17, 18, 24, 0.7);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            margin-bottom: 80px;
+            position: relative;
+        }
+
+        .axis text {
+            fill: #8b949e;
+            font-size: 12px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .axis path,
+        .axis line {
+            stroke: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Тултип */
+        #tooltip {
+            position: absolute;
+            opacity: 0;
+            background: rgba(5, 5, 8, 0.95);
+            border-left: 3px solid #fff;
+            color: #fff;
+            padding: 15px;
+            border-radius: 4px 8px 8px 4px;
+            pointer-events: none;
+            font-size: 14px;
+            z-index: 100;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        /* D3.js cclasses */
+        circle {
+            transition: opacity 0.3s ease, stroke-width 0.2s ease;
+        }
+
+        .legend-item {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .legend-item:hover {
+            opacity: 0.7;
+        }
+
+        .grid line {
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-dasharray: 4, 4;
+        }
+
+        .grid path {
+            stroke-width: 0;
+        }
+
+        /* Футер з інформацією про проєкт */
+        .footer {
+            margin-top: 20px;
+            padding: 30px;
+            text-align: center;
+            color: #8b949e;
+            font-size: 0.95rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            width: 90%;
+            max-width: 1100px;
+            line-height: 1.8;
+            background: rgba(17, 18, 24, 0.4);
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        .footer a {
+            color: #00f0ff;
+            /* Неоновий блакитний для посилань */
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #ccff00;
+            /* При наведенні стає зеленим */
+        }
+
+        .code-snippet {
+            background: #111218;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #ff003c;
+            /* Акцентний червоний для коду */
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Звуковий слід 2000-х</h1>
+    <p class="subtitle">Емоції, ритм та час. Інтерактивний аналіз даних Spotify.</p>
+
+    <div class="roster">
+        <div class="artist-card" style="--accent: #ff003c; --accent-glow: rgba(255,0,60,0.4);">
+            <img src="mcr.jpg" alt="My Chemical Romance">
+            <div class="artist-info">
+                <h3>My Chemical Romance</h3>
+            </div>
+        </div>
+        <div class="artist-card" style="--accent: #00f0ff; --accent-glow: rgba(0,240,255,0.4);">
+            <img src="blink.jpg" alt="Blink-182">
+            <div class="artist-info">
+                <h3>Blink-182</h3>
+            </div>
+        </div>
+        <div class="artist-card" style="--accent: #ccff00; --accent-glow: rgba(204,255,0,0.4);">
+            <img src="sum41.jpg" alt="Sum 41">
+            <div class="artist-info">
+                <h3>Sum 41</h3>
+            </div>
+        </div>
+        <div class="artist-card" style="--accent: #b026ff; --accent-glow: rgba(176,38,255,0.4);">
+            <img src="coldplay.jpg" alt="Coldplay">
+            <div class="artist-info">
+                <h3>Coldplay</h3>
+            </div>
+        </div>
+    </div>
+
+    <h2>1. Емоційний спектр</h2>
+    <div id="chart1" class="chart-container"></div>
+
+    <h2>2. Танцювальність та Акустичність</h2>
+    <div id="chart2" class="chart-container"></div>
+
+    <h2>3. Популярність</h2>
+    <div id="chart3" class="chart-container"></div>
+
+    <div id="tooltip"></div>
+
+    <footer class="footer">
+        <p><strong>Автор:</strong> Ілля Хуртак | UCU DATA SCIENCE 2026</p>
+        <p>Курс: <strong>Data Visualization</strong> | Викладач: <strong>Євгенія Дроздова</strong></p>
+        <p><strong>Датасет:</strong> <a
+                href="https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-1921-2020-160k-tracks" target="_blank"
+                rel="noopener noreferrer">Spotify Dataset (1921-2020) на Kaggle</a></p>
+        <p><strong>Link:</strong> <span
+                class="link">https://www.kaggle.com/datasets/yamaerenay/spotify-dataset-1921-2020-160k-tracks</span>
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
