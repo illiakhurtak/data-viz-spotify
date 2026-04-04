@@ -29,6 +29,30 @@ d3.csv("tracks_light.csv").then(function(data) {
         else if (art.includes("coldplay")) d.mainArtist = "Coldplay";
     });
 
+    // --- ГЕНЕРАЦІЯ ТАБЛИЦІ 
+    const first10 = myData.slice(0, 10);
+    const tableColumns = ["name", "mainArtist", "year", "popularity", "valence", "energy", "danceability", "acousticness"];
+
+    // Заповнюємо заголовки
+    const thead = d3.select("#table-head");
+    tableColumns.forEach(col => {
+        thead.append("th").text(col.toUpperCase());
+    });
+
+    // Заповнюємо рядки даними
+    const tbody = d3.select("#table-body");
+    first10.forEach(row => {
+        const tr = tbody.append("tr");
+        tableColumns.forEach(col => {
+            let val = row[col];
+            // Округлюємо дробові числа до 3 знаків для краси
+            if (typeof val === "number" && !Number.isInteger(val)) {
+                val = val.toFixed(3);
+            }
+            tr.append("td").text(val);
+        });
+    });
+
     // Determine dynamic axis domains
     function getDomain(metric) {
         if (metric === "popularity") return [0, 100];

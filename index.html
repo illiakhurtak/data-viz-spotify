@@ -212,6 +212,57 @@
             /* Акцентний червоний для коду */
             font-size: 0.85rem;
         }
+
+        /* Таблиця даних (Glassmorphism) */
+        .table-container {
+            width: 95%;
+            max-width: 1400px;
+            background: rgba(17, 18, 24, 0.7);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            margin-bottom: 60px;
+            overflow-x: auto;
+            /* Дозволяє скролити таблицю на малих екранах */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #data-table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #d1d5db;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        #data-table th {
+            color: #fff;
+            padding: 12px 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        #data-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            white-space: nowrap;
+        }
+
+        #data-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+            cursor: default;
+        }
+
+        /* Неоновий акцент для першої колонки (Назва пісні) */
+        #data-table td:first-child {
+            color: #00f0ff;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -244,6 +295,16 @@
                 <h3>Coldplay</h3>
             </div>
         </div>
+    </div>
+
+    <h2>Сирі Дані (Прев'ю 10 записів)</h2>
+    <div class="table-container">
+        <table id="data-table">
+            <thead>
+                <tr id="table-head"></tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
     </div>
 
     <h2>1. Емоційний спектр</h2>
