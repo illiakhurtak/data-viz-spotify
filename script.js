@@ -48,9 +48,8 @@ d3.csv("tracks_light.csv").then(function(data) {
     });
 
     // 2. Налаштування полотна радара
-    const rWidth = 600, rHeight = 450; // Зробили полотно значно ширшим
-    const rRadius = Math.min(rWidth, rHeight) / 2 - 80; // Дали більше відступу від країв
-
+    const rWidth = 800, rHeight = 450; // Збільшили ширину SVG з 600 до 800
+    const rRadius = Math.min(rWidth, rHeight) / 2 - 90; // Дали ще трохи більше відступу
     const radarSvg = d3.select("#radar-chart")
         .append("svg")
         .attr("width", rWidth)
