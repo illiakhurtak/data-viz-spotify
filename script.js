@@ -48,8 +48,8 @@ d3.csv("tracks_light.csv").then(function(data) {
     });
 
     // 2. Налаштування полотна радара
-    const rWidth = 400, rHeight = 400;
-    const rRadius = Math.min(rWidth, rHeight) / 2 - 50;
+    const rWidth = 600, rHeight = 450; // Зробили полотно значно ширшим
+    const rRadius = Math.min(rWidth, rHeight) / 2 - 80; // Дали більше відступу від країв
 
     const radarSvg = d3.select("#radar-chart")
         .append("svg")
@@ -75,7 +75,8 @@ d3.csv("tracks_light.csv").then(function(data) {
 
     // 5. Малюємо осі та підписи
     radarFeatures.forEach((f, i) => {
-        const angle = angleScale(f) - Math.PI/2; // -PI/2 щоб почати з 12-ї години
+        const angle = angleScale(f) - Math.PI/2;
+        
         // Лінія осі
         radarSvg.append("line")
             .attr("x1", 0).attr("y1", 0)
@@ -83,15 +84,23 @@ d3.csv("tracks_light.csv").then(function(data) {
             .attr("y2", rScaleRadar(1) * Math.sin(angle))
             .style("stroke", "rgba(255,255,255,0.2)")
             .style("stroke-width", "1px");
+            
+        // Розумне вирівнювання тексту
+        let alignText = "middle";
+        if (Math.cos(angle) > 0.5) alignText = "start";   // Якщо це права сторона
+        else if (Math.cos(angle) < -0.5) alignText = "end"; // Якщо це ліва сторона
+
         // Текст (Настрій, Енергія тощо)
         radarSvg.append("text")
-            .attr("x", (rRadius + 30) * Math.cos(angle))
-            .attr("y", (rRadius + 30) * Math.sin(angle))
+            .attr("x", (rRadius + 20) * Math.cos(angle))
+            .attr("y", (rRadius + 25) * Math.sin(angle))
             .text(radarLabels[i])
-            .style("text-anchor", "middle")
+            .style("text-anchor", alignText)
             .style("alignment-baseline", "middle")
             .style("fill", "#c5c6c7")
-            .style("font-weight", "bold");
+            .style("font-size", "14px")
+            .style("font-weight", "bold")
+            .style("letter-spacing", "1px");
     });
 
     // 6. Генератор полігону (самого графіка)
