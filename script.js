@@ -30,7 +30,7 @@ d3.csv("tracks_light.csv").then(function(data) {
     });
 
     // --- ГЕНЕРАЦІЯ ТАБЛИЦІ 
-    const first10 = myData.slice(0, 10);
+    const random10 = [...myData].sort(() => 0.5 - Math.random()).slice(0, 10);
     const tableColumns = ["name", "mainArtist", "year", "popularity", "valence", "energy", "danceability", "acousticness"];
 
     // Заповнюємо заголовки
@@ -41,7 +41,7 @@ d3.csv("tracks_light.csv").then(function(data) {
 
     // Заповнюємо рядки даними
     const tbody = d3.select("#table-body");
-    first10.forEach(row => {
+    random10.forEach(row => {
         const tr = tbody.append("tr");
         tableColumns.forEach(col => {
             let val = row[col];
