@@ -32,7 +32,104 @@ d3.csv("tracks_light.csv").then(function(data) {
     // --- ГЕНЕРАЦІЯ ТАБЛИЦІ 
     const random10 = [...myData].sort(() => 0.5 - Math.random()).slice(0, 10);
     const tableColumns = ["name", "mainArtist", "year", "popularity", "valence", "energy", "danceability", "acousticness"];
+    // ==========================================
+    // --- РАДАРНА ДІАГРАМА (SPIDER CHART) ---
+    // ==========================================
+    const radarFeatures = ["valence", "energy", "danceability", "acousticness"];
+    const radarLabels = ["Настрій", "Енергія", "Танцювальність", "Акустичність"];
 
+    // 1. Рахуємо середні значення для кожного артиста
+    const artistAverages = Array.from(d3.group(myData, d => d.mainArtist), ([artist, tracks]) => {
+        let avg = { mainArtist: artist };
+        radarFeatures.forEach(f => {
+            avg[f] = d3.mean(tracks, d => d[f]);
+        });
+        return avg;
+    });
+
+    // 2. Налаштування полотна радара
+    const rWidth = 400, rHeight = 400;
+    const rRadius = Math.min(rWidth, rHeight) / 2 - 50;
+
+    const radarSvg = d3.select("#radar-chart")
+        .append("svg")
+        .attr("width", rWidth)
+        .attr("height", rHeight)
+        .append("g")
+        .attr("transform", `translate(${rWidth/2}, ${rHeight/2})`);
+
+    // 3. Шкали (радіус та кут)
+    const rScaleRadar = d3.scaleLinear().range([0, rRadius]).domain([0, 1]);
+    const angleScale = d3.scaleOrdinal()
+        .domain(radarFeatures)
+        .range([0, Math.PI/2, Math.PI, 3*Math.PI/2]); // 4 точки: верх, право, низ, ліво
+
+    // 4. Малюємо "павутину" (фонові кола)
+    const ticks = [0.2, 0.4, 0.6, 0.8, 1];
+    radarSvg.selectAll(".grid-circle")
+        .data(ticks).enter().append("circle")
+        .attr("r", d => rScaleRadar(d))
+        .style("fill", "none")
+        .style("stroke", "rgba(255,255,255,0.1)")
+        .style("stroke-dasharray", "3,3");
+
+    // 5. Малюємо осі та підписи
+    radarFeatures.forEach((f, i) => {
+        const angle = angleScale(f) - Math.PI/2; // -PI/2 щоб почати з 12-ї години
+        // Лінія осі
+        radarSvg.append("line")
+            .attr("x1", 0).attr("y1", 0)
+            .attr("x2", rScaleRadar(1) * Math.cos(angle))
+            .attr("y2", rScaleRadar(1) * Math.sin(angle))
+            .style("stroke", "rgba(255,255,255,0.2)")
+            .style("stroke-width", "1px");
+        // Текст (Настрій, Енергія тощо)
+        radarSvg.append("text")
+            .attr("x", (rRadius + 30) * Math.cos(angle))
+            .attr("y", (rRadius + 30) * Math.sin(angle))
+            .text(radarLabels[i])
+            .style("text-anchor", "middle")
+            .style("alignment-baseline", "middle")
+            .style("fill", "#c5c6c7")
+            .style("font-weight", "bold");
+    });
+
+    // 6. Генератор полігону (самого графіка)
+    const radarLine = d3.lineRadial()
+        .angle(d => angleScale(d[0]))
+        .radius(d => rScaleRadar(d[1]))
+        .curve(d3.curveLinearClosed);
+
+    const radarPath = radarSvg.append("path")
+        .style("stroke-width", 3)
+        .style("opacity", 0.8);
+
+    // 7. Функція оновлення радара
+    function updateRadar(artistName) {
+        const dataPoint = artistAverages.find(d => d.mainArtist === artistName);
+        if(!dataPoint) return;
+
+        const color = colorScale(artistName);
+        const polygonData = radarFeatures.map(f => [f, dataPoint[f]]);
+
+        radarPath.datum(polygonData)
+            .transition().duration(500) // Плавна анімація (півсекунди)
+            .attr("d", radarLine)
+            .style("fill", color)
+            .style("stroke", color);
+    }
+
+    // 8. Запускаємо початковий радар для першого гурту
+    updateRadar("My Chemical Romance");
+
+    // 9. Прив'язуємо подію Hover до карток гуртів у HTML
+    d3.selectAll(".artist-card").on("mouseover", function() {
+        const artistName = d3.select(this).select("h3").text();
+        updateRadar(artistName);
+    });
+    // ==========================================
+    // --- КІНЕЦЬ РАДАРНОЇ ДІАГРАМИ ---
+    // ==========================================
     // Заповнюємо заголовки
     const thead = d3.select("#table-head");
     tableColumns.forEach(col => {
