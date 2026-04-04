@@ -41,7 +41,7 @@ d3.csv("tracks_light.csv").then(function(data) {
         const container = document.getElementById(containerId);
         const width = container.clientWidth;
         const height = container.clientHeight;
-        const margin = { top: 40, right: 200, bottom: 60, left: 60 };
+        const margin = { top: 40, right: 140, bottom: 60, left: 60 };
 
         // Append SVG
         const svg = d3.select("#" + containerId)
